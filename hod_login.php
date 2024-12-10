@@ -11,13 +11,13 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
  
-    $uuname = trim($_POST['uuname']);
+    $uname = trim($_POST['uname']);
     $password = trim($_POST['password']);
     $role = trim($_POST['role']);
     $captcha_response = $_POST['g-recaptcha-response'];
 
  
-    $secret_key = "6LdipZMqAAAAAFzD-Af8XnlyxJp0xhPZrr7gbirl"; // Replace with your Secret Key
+    $secret_key = "6LdoI5gqAAAAACjFJPeTqF3vgte7-lh5P53aqH98"; // Replace with your Secret Key
     $verify_url = "https://www.google.com/recaptcha/api/siteverify";
     $response = file_get_contents($verify_url . "?secret=" . $secret_key . "&response=" . $captcha_response);
     $response_keys = json_decode($response, true);
@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   
     $query = "SELECT * FROM staff WHERE staff_name = ? AND password = ? AND role = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("sss", $uuname, $ppassword, $rrole);
+    $stmt->bind_param("sss", $uname, $password, $role);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -105,14 +105,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <label for="role">Role:</label>
         <input type="text" id="role" name="role" required>
 
-        <label for="uuname">Username:</label>
-        <input type="text" id="uuname" name="uuname" required>
+        <label for="uname">Username:</label>
+        <input type="text" id="uname" name="uname" required>
 
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required>
 
 
-        <div class="g-recaptcha" data-sitekey="6LcyrZMqAAAAADtm2fXS3sOfUr3RNnRWwxhGAUJn"></div>
+        <div class="g-recaptcha" data-sitekey="6LdoI5gqAAAAAAqL1JocTO8c0qLmiVkox_7RANc_"></div>
 
         <button type="submit">Login</button>
     </form>
