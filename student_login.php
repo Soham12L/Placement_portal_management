@@ -1,44 +1,49 @@
 <?php
-    require_once "config.php";
-    // mysql_select_db();
-    session_start();
-    // Check if the user is already logged in, if yes then redirect him to welcome page
-    if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
+require_once "config.php";
+session_start();
+
+// Check if the user is already logged in
+if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
     header("location: student_profile.php");
     exit;
+}
+
+if (isset($_POST['submit'])) {
+    $uname = trim($_POST['uname']);
+    $password = trim($_POST['password']);
+    $regdno = trim($_POST['regdno']);
+    $captcha_response = $_POST['g-recaptcha-response']; // Captcha response from form
+
+    // Verify CAPTCHA
+    $secret_key = "6LdoI5gqAAAAACjFJPeTqF3vgte7-lh5P53aqH98"; // Replace with your actual secret key
+    $verify_url = "https://www.google.com/recaptcha/api/siteverify";
+    $response = file_get_contents($verify_url . "?secret=" . $secret_key . "&response=" . $captcha_response);
+    $response_keys = json_decode($response, true);
+
+    if (!$response_keys['success']) {
+        echo "CAPTCHA verification failed. Please try again.";
+        exit;
     }
 
-    if (isset($_POST['submit'])){
-        $uname=$_POST['uname'];
-        $password=$_POST['password'];
-        $regdno=$_POST['regdno'];
-        $query="select * from student where regdno='$regdno' and name='$uname' and password='$password' ";
-        $result=mysqli_query($conn,$query);
-        if(mysqli_num_rows($result)==1){   
-            echo "You have sucessfully logged in";
-            session_start();
-            $_SESSION["loggedin"] = true;
-            $_SESSION["username"] = $uname; 
-                if ($result->num_rows > 0) 
-                {
-                // fetch all data from db into array 
-                $row1 = $result->fetch_assoc();  
-                }     
-                //while($rows1=$result->fetch_assoc())
-                //{
-                    $num=$row1['regdno']; 
-                    $_SESSION["num"] = $num; 
-                //}
-                header("location: student_profile.php");
-                exit(); 
-            }
-        else{
-            
-            echo "You entered wrong credentials ";
-            echo $uname;
-            exit();
-        }
+    // Check user credentials
+    $query = "SELECT * FROM student WHERE regdno='$regdno' AND name='$uname' AND password='$password'";
+    $result = mysqli_query($conn, $query);
+
+    if (mysqli_num_rows($result) == 1) {
+        echo "You have successfully logged in";
+        $_SESSION["loggedin"] = true;
+        $_SESSION["username"] = $uname;
+
+        $row1 = mysqli_fetch_assoc($result);
+        $_SESSION["num"] = $row1['regdno'];
+
+        header("location: student_profile.php");
+        exit();
+    } else {
+        echo "You entered wrong credentials.";
+        exit();
     }
+}
 ?>
 
 
@@ -50,6 +55,8 @@
 	<style>
         
     </style>
+    <!-- Include Google reCAPTCHA API -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
 <div style="text-align:center">
@@ -73,6 +80,12 @@
             <label for="student_password">Password:</label>
             <input type='password' id="student_password" name="password" required></td>
         </tr>
+        <!-- Add reCAPTCHA widget -->
+        <tr>
+            <td align='center'>
+                <div class="g-recaptcha" data-sitekey="6LdoI5gqAAAAAAqL1JocTO8c0qLmiVkox_7RANc_"></div>
+            </td>
+        </tr>
         <tr>
             <td align='center'><br>
 			<input type="submit" id="submit" value="submit" name="submit" style="display:none;">
@@ -82,4 +95,4 @@
         </table>
     </form>
 </body>
-</html
+</html>
