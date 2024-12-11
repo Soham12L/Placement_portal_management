@@ -9,14 +9,13 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
     exit;
 }
 
-// Initialize session variables to track failed login attempts and lockout time
 if (!isset($_SESSION['failed_attempts'])) {
     $_SESSION['failed_attempts'] = 0;
     $_SESSION['lockout_time'] = 0;
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Check if the account is locked
+
     if ($_SESSION['failed_attempts'] >= 3 && time() < $_SESSION['lockout_time']) {
         $remaining_time = $_SESSION['lockout_time'] - time();
         echo "Account is locked. Please wait $remaining_time seconds before trying again.";
@@ -28,16 +27,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $role = trim($_POST['role']);
     $captcha_response = $_POST['g-recaptcha-response'];
 
-    // CAPTCHA Secret Key
+
     $secret_key = "6LdoI5gqAAAAACjFJPeTqF3vgte7-lh5P53aqH98";
     $verify_url = "https://www.google.com/recaptcha/api/siteverify";
 
-    // Verify CAPTCHA response
+    
     $response = file_get_contents($verify_url . "?secret=" . $secret_key . "&response=" . $captcha_response);
     $response_keys = json_decode($response, true);
 
     if ($response_keys['success']) {
-        // Validate user credentials
+        
         $query = "SELECT * FROM staff WHERE staff_name = ? AND password = ? AND role = ?";
         $stmt = $conn->prepare($query);
 
@@ -47,12 +46,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $result = $stmt->get_result();
 
             if ($result->num_rows == 1 && $role == "hod") {
-                // Successful login
+               
                 $_SESSION["loggedin"] = true;
                 $_SESSION["role"] = $role;
                 $_SESSION["username"] = $uname;
 
-                // Reset failed attempts on successful login
+                
                 $_SESSION['failed_attempts'] = 0;
                 $_SESSION['lockout_time'] = 0;
 
@@ -66,10 +65,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 header("location: hod_access2.php");
                 exit;
             } else {
-                // Increment failed attempts
+             
                 $_SESSION['failed_attempts']++;
                 if ($_SESSION['failed_attempts'] >= 3) {
-                    $_SESSION['lockout_time'] = time() + 180; // Lock for 3 minutes
+                    $_SESSION['lockout_time'] = time() + 180; 
                     echo "Too many failed attempts. Account is locked for 3 minutes.";
                 } else {
                     echo "Invalid credentials. You have " . (3 - $_SESSION['failed_attempts']) . " attempts remaining.";
