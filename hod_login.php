@@ -1,13 +1,17 @@
 <?php
 require_once "config.php";
-
 session_name("hod");
-session_start(); 
+session_start([
+    'cookie_httponly' => true,  
+    'cookie_secure' => true,    
+    'cookie_samesite' => 'Strict' 
+]);
 
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
     header("location: hod_access2.php");
     exit;
 }
+
 
 if (!isset($_SESSION['failed_attempts'])) {
     $_SESSION['failed_attempts'] = 0;
@@ -15,7 +19,7 @@ if (!isset($_SESSION['failed_attempts'])) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
+    
     if ($_SESSION['failed_attempts'] >= 3 && time() < $_SESSION['lockout_time']) {
         $remaining_time = $_SESSION['lockout_time'] - time();
         echo "Account is locked. Please wait $remaining_time seconds before trying again.";
@@ -27,11 +31,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $role = trim($_POST['role']);
     $captcha_response = $_POST['g-recaptcha-response'];
 
-
+    
     $secret_key = "6LdoI5gqAAAAACjFJPeTqF3vgte7-lh5P53aqH98";
     $verify_url = "https://www.google.com/recaptcha/api/siteverify";
 
-    
+   
     $response = file_get_contents($verify_url . "?secret=" . $secret_key . "&response=" . $captcha_response);
     $response_keys = json_decode($response, true);
 
@@ -46,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $result = $stmt->get_result();
 
             if ($result->num_rows == 1 && $role == "hod") {
-               
+                
                 $_SESSION["loggedin"] = true;
                 $_SESSION["role"] = $role;
                 $_SESSION["username"] = $uname;
@@ -65,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 header("location: hod_access2.php");
                 exit;
             } else {
-             
+                
                 $_SESSION['failed_attempts']++;
                 if ($_SESSION['failed_attempts'] >= 3) {
                     $_SESSION['lockout_time'] = time() + 180; 
