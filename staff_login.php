@@ -1,7 +1,12 @@
 <?php
 require_once "config.php";
 session_name("staff");
-session_start();
+session_start([
+    'cookie_httponly' => true,  
+    'cookie_secure' => true,    
+    'cookie_samesite' => 'Strict' 
+]);
+
 
 
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
@@ -26,7 +31,7 @@ if (isset($_POST['submit'])) {
         $uname = $_POST['uname'];
         $password = $_POST['password'];
         $role = $_POST['role'];
-        $captcha_response = $_POST['g-recaptcha-response'];
+        $captcha_response = $_POST['g-recaptcha-response']; 
 
         
         $uname = stripcslashes($uname);
@@ -63,7 +68,7 @@ if (isset($_POST['submit'])) {
                 
                 $_SESSION['failed_attempts']++;
                 if ($_SESSION['failed_attempts'] >= 3) {
-                
+                    
                     $_SESSION['lockout_time'] = time() + 180; 
                     $error_message = "Too many failed attempts. Account is locked for 3 minutes.";
                 } else {
