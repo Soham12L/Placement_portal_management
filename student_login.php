@@ -6,74 +6,46 @@ session_start([
     'cookie_samesite' => 'Strict' 
 ]);
 
-
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
     header("location: student_profile.php");
     exit;
 }
 
-
-if (!isset($_SESSION['failed_attempts'])) {
-    $_SESSION['failed_attempts'] = 0;
-    $_SESSION['lockout_time'] = 0;
-}
-
 $error_message = ""; // 
 
 if (isset($_POST['submit'])) {
-    
-    if ($_SESSION['failed_attempts'] >= 3 && time() < $_SESSION['lockout_time']) {
-        $remaining_time = $_SESSION['lockout_time'] - time();
-        $error_message = "Account is locked. Please wait $remaining_time seconds before trying again.";
+    $uname = trim($_POST['uname']);
+    $password = trim($_POST['password']);
+    $regdno = trim($_POST['regdno']);
+    $captcha_response = $_POST['g-recaptcha-response']; 
+
+    // Verify CAPTCHA
+    $secret_key = "6LdoI5gqAAAAACjFJPeTqF3vgte7-lh5P53aqH98"; 
+    $verify_url = "https://www.google.com/recaptcha/api/siteverify";
+    $response = file_get_contents($verify_url . "?secret=" . $secret_key . "&response=" . $captcha_response);
+    $response_keys = json_decode($response, true);
+
+    if (!$response_keys['success']) {
+        $error_message = "CAPTCHA verification failed. Please try again.";
     } else {
-        $uname = trim($_POST['uname']);
-        $password = trim($_POST['password']);
-        $regdno = trim($_POST['regdno']);
-        $captcha_response = $_POST['g-recaptcha-response']; 
+        $query = "SELECT * FROM student WHERE regdno='$regdno' AND name='$uname' AND password='$password'";
+        $result = mysqli_query($conn, $query);
 
-       
-        $secret_key = "6LdoI5gqAAAAACjFJPeTqF3vgte7-lh5P53aqH98"; 
-        $verify_url = "https://www.google.com/recaptcha/api/siteverify";
-        $response = file_get_contents($verify_url . "?secret=" . $secret_key . "&response=" . $captcha_response);
-        $response_keys = json_decode($response, true);
+        if (mysqli_num_rows($result) == 1) {
+            $_SESSION["loggedin"] = true;
+            $_SESSION["username"] = $uname;
 
-        if (!$response_keys['success']) {
-            $error_message = "CAPTCHA verification failed. Please try again.";
+            $row1 = mysqli_fetch_assoc($result);
+            $_SESSION["num"] = $row1['regdno'];
+
+            header("location: student_profile.php");
+            exit();
         } else {
-            
-            $query = "SELECT * FROM student WHERE regdno='$regdno' AND name='$uname' AND password='$password'";
-            $result = mysqli_query($conn, $query);
-
-            if (mysqli_num_rows($result) == 1) {
-                $_SESSION["loggedin"] = true;
-                $_SESSION["username"] = $uname;
-
-                $row1 = mysqli_fetch_assoc($result);
-                $_SESSION["num"] = $row1['regdno'];
-
-                
-                $_SESSION['failed_attempts'] = 0;
-                $_SESSION['lockout_time'] = 0;
-
-                header("location: student_profile.php");
-                exit();
-            } else {
-                
-                $_SESSION['failed_attempts']++;
-                if ($_SESSION['failed_attempts'] >= 3) {
-                    $_SESSION['lockout_time'] = time() + 180; // Lock for 3 minutes
-                    $error_message = "Too many failed attempts. Account is locked for 3 minutes.";
-                } else {
-                    $remaining_attempts = 3 - $_SESSION['failed_attempts'];
-                    $error_message = "Invalid credentials. You have $remaining_attempts attempts remaining.";
-                }
-            }
+            $error_message = "Invalid credentials. Please try again.";
         }
     }
 }
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -126,9 +98,9 @@ if (isset($_POST['submit'])) {
         </tr>
         <tr>
             <td align='center'><br>
-			<input type="submit" id="submit" value="submit" name="submit" style="display:none;">
+            <input type="submit" id="submit" value="submit" name="submit" style="display:none;">
                 <label for="submit"><img src="login1.jpg" alt="submit" width="80" height="30"></label>
-			</td>
+            </td>
         </tr>
         </table>
     </form>
