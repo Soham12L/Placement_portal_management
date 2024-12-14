@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if ($_SESSION['failed_attempts'] >= 3 && time() < $_SESSION['lockout_time']) {
         $remaining_time = $_SESSION['lockout_time'] - time();
-        echo "Account is locked. Please wait $remaining_time seconds before trying again.";
+        echo "Too many wrong attempts. Try again after $remaining_time seconds.";
         exit;
     }
 
@@ -73,16 +73,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['failed_attempts']++;
                 if ($_SESSION['failed_attempts'] >= 3) {
                     $_SESSION['lockout_time'] = time() + 180; 
-                    echo "Too many failed attempts. Account is locked for 3 minutes.";
+                    echo "Multiple wrong attempts. Account is locked for 3 minutes";
                 } else {
-                    echo "Invalid credentials. You have " . (3 - $_SESSION['failed_attempts']) . " attempts remaining.";
+                    echo "Wrong input. Only" . (3 - $_SESSION['failed_attempts']) . " attempts remaining.";
                 }
             }
         } else {
-            echo "Database query preparation failed.";
+            echo "Database query preparation invalid.";
         }
     } else {
-        echo "CAPTCHA verification failed. Please try again.";
+        echo "CAPTCHA verification not complete. Please try again.";
     }
 }
 ?>
@@ -131,3 +131,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </form>
 </div>
 </body>
+</html>
