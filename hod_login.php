@@ -92,68 +92,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOD Login</title>
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        form {
-            display: inline-block;
-            text-align: left;
-            background: #f5f5f5;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            
-        }
-        label {
-            display: block;
-            margin: 10px 0 5px;
-        }
-        input {
-            width: 100%;
-            padding: 8px;
-            margin: 5px 0 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .g-recaptcha {
-            margin-bottom: 15px;
-        }
-        button {
-            background: #11107bff;
-            color: #ff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-    </style>
+<title>Admin login</title>
+<link type="text/css" rel="stylesheet" href="stylesheet.css">
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
-    <h1>HOD Login</h1>
-    <form action="" method="post">
-        <label for="role">Role:</label>
-        <input type="text" id="role" name="role" required>
-
-        <label for="uname">Username:</label>
-        <input type="text" id="uname" name="uname" required>
-
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-
-
-        <div class="g-recaptcha" data-sitekey="6LdoI5gqAAAAAAqL1JocTO8c0qLmiVkox_7RANc_"></div>
-
-        <button type="submit">Login</button>
-    </form>
+<div style="text-align:center">
+<form action="#" method="post">
+    <table align='center' style="font-weight:bold;">  
+        <tr>
+            <td><h1 style='text-align:center'>Hod login</h1></td>
+        </tr>
+        <tr>
+            <td align='right'>
+            <label for="role_staff">Role:</label>
+            <input type='text' name="role" id="role_staff" required></td>
+        </tr>
+        <tr>
+            <td align='right'>
+            <label for="login_staff">name:</label>
+            <input type='text' name="uname" id="login_staff" required></td>
+        </tr>
+        <tr>
+            <td>
+            <label for="password_staff">Password:</label>
+            <input type='password' name="password" id="password_staff" required></td>
+        </tr>
+            <td align='center'>
+                <div class="g-recaptcha" data-sitekey="6LdoI5gqAAAAAAqL1JocTO8c0qLmiVkox_7RANc_"></div>
+            </td>
+        <tr>
+            <td align='center'><br>
+            <input type="submit" id="submit" value="submit" name="submit" style="display:none;">
+                <label for="submit"><img src="login1.jpg" alt="submit" width="80" height="30"></label>
+            </td>
+        </tr>
+    </table>
+</form>
+</div>
 </body>
-</html>
