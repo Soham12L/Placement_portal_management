@@ -4,7 +4,7 @@ server with default setting (user 'root' with no password) */
 $host="localhost";
     $user="root";
     $password="";
-    $db='miniproject';
+    $db='my project';
     $conn=mysqli_connect($host,$user,$password,$db);
  
 // Check connection
