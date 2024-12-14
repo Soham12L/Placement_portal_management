@@ -35,7 +35,3 @@ The portal incorporates robust security measures to ensure data protection and s
 - Database: MySQL
 - Security Tools: Google reCAPTCHA
 
-## Setup and Usage
-1. Clone the repository:
-   ```bash
-   git clone [repository link]
